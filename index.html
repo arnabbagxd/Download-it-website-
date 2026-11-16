@@ -1,0 +1,1231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Download It — Paste a link. Keep the file.</title>
+<meta name="description" content="Download It is a free, native macOS downloader for video, images and PDFs. Paste a link from YouTube, Instagram, X, TikTok and thousands more, pick a quality, done." />
+<link rel="icon" href="app-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@500&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* Layout: one 1024 column, a full-bleed desktop scene under the hero, alternating 2-col feature rows, hairline rules */
+:root {
+  color-scheme: light;
+  /* Neutrals: warm paper ramp */
+  --ink-strong: #121212;
+  --ink-heading: #343433;
+  --ink-body: #494440;
+  --ink-2: #5d5955;
+  --ink-muted: #77736f;
+  --surface: #ffffff;
+  --surface-card: #fbfaf9;
+  --surface-warm: #f6f4ef;
+  --surface-raised: #efebe5;
+  --line: #f0ede8;
+  --hair: rgb(18 18 18 / .08);
+  --button-dark: #171717;
+
+  /* The app's blue (from its icon) is the one accent; sections keep a small eyebrow color */
+  --app-blue: #148dff;
+  --accent-blue: #1f73d8;
+  --accent-gold: #9a6a14;
+  --accent-green: #1f8a52;
+  --accent-orange: #d9460c;
+  --positive: #16a34a;
+
+  --font-display: "Geist", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", -apple-system, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --r-ctl: 8px; --r-card: 12px; --r-panel: 20px; --r-pill: 999px;
+  --ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --fast: 120ms; --ui: 220ms; --enter: 420ms;
+}
+@media (color-gamut: p3) {
+  :root { --app-blue: color(display-p3 0.2 0.55 1); }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  background: var(--surface); color: var(--ink-body);
+  font: 400 17px/26px var(--font-body); letter-spacing: -0.22px;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid #848281; outline-offset: 3px; border-radius: 6px; }
+img, svg { display: block; }
+.ico { width: 16px; height: 16px; flex: none; }
+.container { max-width: calc(1008px + 2rem); padding: 0 1rem; margin: 0 auto; }
+.frame { max-width: 67rem; padding: 0 1rem; margin: 0 auto; }
+.mono { font-family: var(--font-mono); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+
+/* Type */
+.display { font-family: var(--font-display); font-weight: 500; color: var(--ink-strong); text-wrap: balance; }
+.h-hero { font-size: 68px; line-height: 1.1; letter-spacing: -0.02em; color: var(--ink-heading); }
+.h2 { font-size: 44px; line-height: 48px; letter-spacing: -0.03em; }
+.lead { font-size: 19px; line-height: 28px; letter-spacing: -0.3px; color: #474645; }
+.small { font-size: 15px; line-height: 22px; letter-spacing: -0.13px; }
+.eyebrow { font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: -0.09px; }
+.muted { color: var(--ink-muted); }
+.eyebrow.blue { color: var(--accent-blue); } .eyebrow.gold { color: var(--accent-gold); }
+.eyebrow.green { color: var(--accent-green); } .eyebrow.orange { color: var(--accent-orange); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 48px; border-radius: var(--r-pill);
+  font: 500 17px/1 var(--font-body); letter-spacing: -0.22px; border: 0; cursor: pointer; white-space: nowrap;
+  transition: background-color var(--fast) ease, transform var(--fast) ease;
+}
+.btn:active { transform: scale(.98); }
+.btn .ico { width: 18px; height: 18px; }
+.btn-dark { background: var(--button-dark); color: #fff; padding: 0 24px 0 20px; box-shadow: inset 0 1px 0 rgb(255 255 255 / .12); }
+.btn-dark:hover { background: #2a2928; }
+.btn-light { background: var(--surface-warm); color: var(--ink-strong); padding: 0 20px 0 18px; }
+.btn-light:hover { background: var(--surface-raised); }
+.btn-sm { height: 32px; font-size: 15px; letter-spacing: -0.09px; padding: 0 14px; gap: 6px; }
+.btn-sm .ico { width: 16px; height: 16px; }
+.link-cta { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; padding: 2px 6px; margin: 0 -6px; border-radius: var(--r-ctl); transition: background-color var(--fast) ease; }
+.link-cta:hover { background: rgb(0 0 0 / .04); }
+.link-cta .ico { width: 18px; height: 18px; transition: transform var(--ui) var(--ease); }
+.link-cta:hover .ico { transform: translateX(3px); }
+
+/* Nav */
+.nav { position: sticky; top: 0; z-index: 50; background: rgb(255 255 255 / .9); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); border-bottom: 1px solid transparent; transition: border-color var(--ui) ease, background-color var(--ui) ease; }
+.nav.scrolled { border-bottom-color: var(--line); }
+.nav-inner { height: 60px; display: flex; align-items: center; gap: 28px; }
+.brand { display: flex; align-items: center; gap: 8px; font: 500 18px/1 var(--font-display); color: var(--ink-strong); letter-spacing: -0.03em; }
+.brand img { width: 28px; height: 28px; }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a { font-size: 15px; font-weight: 500; letter-spacing: -0.09px; color: #474645; padding: 6px 10px; border-radius: 6px; transition: background-color var(--fast) ease; }
+.nav-links a:hover { background: var(--surface-warm); }
+.nav-right { margin-left: auto; display: flex; gap: 12px; align-items: center; }
+.gh-link { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; color: #474645; padding: 6px 8px; border-radius: 6px; transition: background-color var(--fast) ease; }
+.gh-link:hover { background: var(--surface-warm); }
+.gh-link b { font-weight: 500; color: var(--ink-muted); font-family: var(--font-mono); font-size: 13px; }
+
+/* ================= Hero ================= */
+.hero { position: relative; padding: 96px 0 0; text-align: center; overflow: hidden; }
+.hero-copy { position: relative; z-index: 2; }
+.hero .lead { max-width: 30rem; margin: 24px auto 0; }
+.hero-actions { display: flex; justify-content: center; gap: 12px; margin-top: 32px; }
+
+.art { position: absolute; z-index: 1; pointer-events: none; }
+.art-l { left: max(-40px, calc(50% - 700px)); top: 72px; width: 260px; height: 320px; }
+.art-r { right: max(-40px, calc(50% - 700px)); top: 64px; width: 260px; height: 320px; }
+.art svg { position: absolute; }
+
+/* Desktop scene */
+.scene-wrap { position: relative; z-index: 2; max-width: 1104px; margin: 64px auto 0; padding: 0 16px; }
+.scene {
+  position: relative; overflow: hidden; border-radius: 16px 16px 0 0;
+  aspect-ratio: 16 / 8.6; text-align: left; background: #bcdcff;
+  -webkit-mask-image: linear-gradient(#000 82%, transparent); mask-image: linear-gradient(#000 82%, transparent);
+  font-family: var(--font-body);
+}
+.wall { position: absolute; inset: 0; width: 100%; height: 100%; }
+.menubar {
+  position: absolute; z-index: 5; top: 0; left: 0; right: 0; height: 26px; display: flex; align-items: center; gap: 20px;
+  padding: 0 16px; font-size: 13px; font-weight: 500; letter-spacing: -0.1px; color: rgb(16 22 34 / .85);
+  background: rgb(255 255 255 / .42); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+}
+.menubar .ico { width: 14px; height: 14px; }
+.menubar b { font-weight: 600; }
+.menubar .right { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+
+/* Browser window */
+.browser {
+  position: absolute; z-index: 2; left: 4%; top: 9.5%; width: 60%; bottom: -4%;
+  background: #fff; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 0 0 .5px rgb(0 0 0 / .18), 0 20px 50px rgb(20 40 80 / .22);
+}
+.bchrome { height: 44px; display: flex; align-items: center; gap: 14px; padding: 0 14px; background: #f6f6f7; border-bottom: 1px solid rgb(0 0 0 / .07); }
+.lights { display: flex; gap: 8px; flex: none; }
+.lights i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .12); }
+.lights i:nth-child(2) { background: #febc2e; } .lights i:nth-child(3) { background: #28c840; }
+.addr {
+  flex: 1; min-width: 0; height: 28px; border-radius: 8px; background: rgb(0 0 0 / .05);
+  display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px;
+  font-size: 12.5px; color: rgb(0 0 0 / .78); letter-spacing: -0.1px; white-space: nowrap; overflow: hidden;
+}
+.addr .ico { width: 12px; height: 12px; color: rgb(0 0 0 / .45); }
+.addr .fav { width: 14px; height: 14px; }
+.addr .url { overflow: hidden; text-overflow: ellipsis; padding: 1px 3px; border-radius: 3px; transition: background-color var(--fast) ease, color var(--fast) ease; }
+.addr .url.sel { background: #b3d7ff; }
+.bpage { padding: 16px; display: grid; grid-template-columns: 1fr 30%; gap: 16px; }
+.player { position: relative; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #111; }
+.player .frame-img { position: absolute; inset: 0; }
+.player .bar { position: absolute; left: 12px; right: 12px; bottom: 12px; height: 3px; border-radius: 2px; background: rgb(255 255 255 / .3); }
+.player .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 34%; background: #fff; border-radius: 2px; }
+.ptitle { margin-top: 12px; font-size: 15px; font-weight: 600; color: #0f0f0f; letter-spacing: -0.2px; }
+.pmeta { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+.pmeta .av { width: 28px; height: 28px; border-radius: 50%; flex: none; }
+.lines { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.ln { height: 7px; border-radius: 4px; background: rgb(0 0 0 / .08); }
+.desc { margin-top: 12px; padding: 12px; border-radius: 10px; background: rgb(0 0 0 / .035); display: flex; flex-direction: column; gap: 8px; }
+.upnext { display: flex; flex-direction: column; gap: 10px; }
+.upnext .item { display: grid; grid-template-columns: 52% 1fr; gap: 8px; }
+.upnext .t { aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; position: relative; }
+
+/* Download It panel (mirrors the app: 680pt capsule, 24pt-radius cards, ultra thin material) */
+.app {
+  position: absolute; z-index: 4; left: 47%; top: 18%; width: 49%;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: opacity 260ms var(--ease-quart), transform var(--enter) var(--ease);
+}
+.app.off { opacity: 0; transform: translateY(8px) scale(.985); }
+.glass {
+  background: rgb(250 251 253 / .72);
+  backdrop-filter: blur(30px) saturate(1.8); -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  box-shadow: 0 0 0 .5px rgb(0 0 0 / .1), inset 0 0 0 1px rgb(255 255 255 / .55), 0 18px 40px rgb(20 40 80 / .18);
+}
+.capsule { height: 56px; border-radius: 28px; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 20px; }
+.capsule > .ico { width: 18px; height: 18px; color: rgb(0 0 0 / .4); }
+.field { flex: 1; min-width: 0; font-size: 15px; letter-spacing: -0.2px; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.field.is-ph { color: rgb(0 0 0 / .38); }
+.caret { display: inline-block; width: 1.5px; height: 17px; background: var(--app-blue); vertical-align: -3px; margin-left: 1px; }
+.pie { width: 28px; height: 28px; flex: none; opacity: 0; transition: opacity 200ms ease; }
+.pie.on { opacity: 1; }
+.capsule .gear { width: 17px; height: 17px; color: rgb(0 0 0 / .42); }
+
+.slot { position: relative; }
+.card {
+  border-radius: 22px; padding: 16px;
+  transition: opacity 240ms var(--ease-quart), transform var(--enter) var(--ease);
+}
+.slot .float-card { position: absolute; left: 0; right: 0; top: 0; z-index: 2; }
+.card.off { opacity: 0; transform: translateY(-6px); pointer-events: none; }
+.probe { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 20px; font-size: 14px; color: rgb(0 0 0 / .52); }
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgb(0 0 0 / .12); border-top-color: rgb(0 0 0 / .55); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.pick-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.pick-head b { display: block; font-size: 15px; font-weight: 600; color: #111; letter-spacing: -0.2px; }
+.pick-head small { font-size: 12px; color: rgb(0 0 0 / .5); }
+.xbtn { width: 24px; height: 24px; border-radius: 50%; background: rgb(0 0 0 / .06); display: grid; place-items: center; color: rgb(0 0 0 / .45); }
+.xbtn .ico { width: 13px; height: 13px; }
+.qrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.qbox {
+  height: 56px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  background: rgb(0 0 0 / .045); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .5);
+  transition: background-color var(--fast) ease, box-shadow var(--fast) ease, transform var(--fast) ease;
+}
+.qbox b { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; color: #111; transition: color var(--fast) ease; }
+.qbox small { font-size: 11px; color: rgb(0 0 0 / .45); }
+.qbox.hot { background: rgb(20 141 255 / .14); box-shadow: inset 0 0 0 1px var(--app-blue); }
+.qbox.hot b { color: var(--app-blue); }
+.qbox.press { transform: scale(.97); }
+
+.history { padding: 8px; }
+.hrow { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 8px; border-radius: 14px; transition: background-color 600ms ease; }
+.hrow.fresh { background: rgb(20 141 255 / .12); animation: rowIn var(--enter) var(--ease) both; }
+@keyframes rowIn { from { opacity: 0; transform: translateY(-8px); } }
+.thumb { width: 64px; height: 48px; border-radius: 9px; flex: none; position: relative; overflow: hidden; background: #ddd; }
+.thumb .dur { position: absolute; right: 3px; bottom: 3px; font: 500 9px/1 var(--font-mono); color: #fff; background: rgb(0 0 0 / .62); padding: 2px 3px; border-radius: 3px; }
+.hmeta { flex: 1; min-width: 0; }
+.hmeta b { display: block; font-size: 14px; font-weight: 400; color: #111; letter-spacing: -0.15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hmeta small { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgb(0 0 0 / .5); margin-top: 2px; white-space: nowrap; }
+.hmeta small svg { width: 12px; height: 12px; flex: none; }
+.hact { display: flex; gap: 4px; opacity: .72; }
+.hact span { width: 28px; height: 28px; border-radius: 8px; background: rgb(0 0 0 / .04); display: grid; place-items: center; color: rgb(0 0 0 / .5); }
+.hact .ico { width: 15px; height: 15px; }
+.hact .ok { color: var(--app-blue); background: rgb(20 141 255 / .14); }
+
+/* Cursor, keystroke HUD and toast */
+.cursor { position: absolute; z-index: 9; left: 0; top: 0; width: 22px; height: 22px; transform: translate(70%, 70%); transition: transform 700ms var(--ease); pointer-events: none; filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / .3)); }
+.cursor.press svg { transform: scale(.88); }
+.cursor svg { transition: transform 100ms ease; transform-origin: 20% 15%; }
+.hud {
+  position: absolute; z-index: 8; left: 50%; bottom: 22%; transform: translate(-50%, 6px);
+  display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 12px;
+  background: rgb(23 23 23 / .82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  opacity: 0; transition: opacity 180ms ease, transform 260ms var(--ease);
+}
+.hud.on { opacity: 1; transform: translate(-50%, 0); }
+.hud kbd { min-width: 30px; height: 30px; padding: 0 8px; border-radius: 7px; background: rgb(255 255 255 / .14); color: #fff; font: 500 14px/30px var(--font-body); text-align: center; box-shadow: inset 0 -1px 0 rgb(0 0 0 / .3); }
+.hud span { color: rgb(255 255 255 / .7); font-size: 12.5px; padding: 0 6px 0 4px; }
+.toast {
+  position: absolute; z-index: 8; right: 4%; bottom: 22%; display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px 8px 10px; border-radius: 999px; background: rgb(23 23 23 / .86); color: #fff;
+  font-size: 13px; font-weight: 500; letter-spacing: -0.1px;
+  opacity: 0; transform: translateY(6px); transition: opacity 200ms ease, transform 300ms var(--ease);
+}
+.toast.on { opacity: 1; transform: none; }
+.toast .ico { color: #4cc38a; width: 15px; height: 15px; }
+
+.hero-meta { margin: 0 auto; padding: 8px 0 0; font-size: 13px; line-height: 18px; font-weight: 500; letter-spacing: -0.13px; color: var(--ink-muted); text-align: center; }
+.hero-meta span + span::before { content: "·"; margin: 0 8px; color: #c9c4bd; }
+
+/* ================= Sections ================= */
+section { position: relative; scroll-margin-top: 60px; }
+.rule { border: 0; border-top: 1px solid var(--line); }
+.sec { padding: 4.75rem 0 6rem; }
+.sec-head { max-width: 40rem; margin-bottom: 48px; }
+.sec-head .h2 { margin-top: 8px; }
+.sec-head .lead { margin-top: 16px; }
+
+/* Bento */
+.bento { display: grid; gap: 32px 28px; grid-template-columns: repeat(3, 1fr); grid-template-areas: "left a b" "left c d"; }
+.bento > :nth-child(1) { grid-area: left; }
+.tile { display: flex; flex-direction: column; gap: 16px; }
+.tile-media { background: var(--surface-card); border-radius: var(--r-card); min-height: 200px; flex: 1; display: grid; place-items: center; position: relative; overflow: hidden; padding: 20px; }
+.tile h3 { font-size: 17px; line-height: 26px; font-weight: 600; letter-spacing: -0.22px; color: var(--ink-strong); }
+.tile p { font-size: 15px; line-height: 22px; letter-spacing: -0.13px; color: var(--ink-2); margin-top: 4px; }
+
+.mini-list { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.mini-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 8px; font-size: 13px; font-weight: 600; color: var(--ink-strong); }
+.mini-head span { font-weight: 400; color: var(--ink-muted); font-size: 12px; }
+.mrow { position: relative; height: 60px; border-radius: 12px; overflow: hidden; transition: height 360ms var(--ease), opacity 240ms ease, margin 360ms var(--ease); }
+.mrow-del { position: absolute; inset: 0; background: #e5484d; color: #fff; display: flex; align-items: center; justify-content: flex-end; padding-right: 28px; border-radius: 12px; }
+.mrow-del .ico { width: 18px; height: 18px; }
+.mrow-fg { position: absolute; inset: 0; background: #fff; box-shadow: 0 0 0 1px var(--hair); display: flex; align-items: center; gap: 12px; padding: 0 8px; border-radius: 12px; transition: transform 520ms var(--ease); }
+.mrow-fg .thumb { width: 56px; height: 42px; border-radius: 8px; }
+.mrow-fg .hmeta b { font-size: 13px; }
+.mrow-fg .hmeta small { font-size: 11.5px; color: var(--ink-muted); }
+.mrow.swiped .mrow-fg { transform: translateX(-76px); }
+.mrow.gone { height: 0; opacity: 0; margin-top: -8px; }
+
+.keys { display: flex; gap: 12px; }
+.key { width: 56px; height: 56px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px var(--hair), 0 3px 0 #e6e1da; display: grid; place-items: center; font: 500 22px/1 var(--font-body); color: var(--ink-strong); transition: transform 100ms ease, box-shadow 100ms ease, color 100ms ease; }
+.key.down { transform: translateY(3px); box-shadow: 0 0 0 1px var(--hair), 0 0 0 #e6e1da; color: var(--app-blue); }
+.tile-cap { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 12.5px; color: var(--ink-muted); font-weight: 500; }
+
+.bigpie { width: 88px; height: 88px; }
+.remux { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+.bar-row { display: grid; grid-template-columns: 76px 1fr 56px; align-items: center; gap: 12px; font-size: 12.5px; font-weight: 500; color: var(--ink-body); }
+.bar-row em { font-style: normal; text-align: right; color: var(--ink-muted); }
+.track { height: 8px; border-radius: 4px; background: var(--surface-raised); overflow: hidden; }
+.track i { display: block; height: 100%; width: 0; border-radius: 4px; }
+
+.trim { width: 100%; }
+.film { height: 52px; border-radius: 10px; display: flex; overflow: hidden; position: relative; gap: 2px; background: #111; }
+.film > i { flex: 1; position: relative; overflow: hidden; }
+.trim-sel { position: absolute; top: 0; bottom: 0; border: 3px solid #f5b442; border-radius: 10px; transition: left 700ms var(--ease), right 700ms var(--ease); box-shadow: 0 0 0 999px rgb(251 250 249 / .6); }
+.trim-sel::before, .trim-sel::after { content: ""; position: absolute; top: 50%; width: 3px; height: 16px; margin-top: -8px; background: #fff; border-radius: 2px; }
+.trim-sel::before { left: 3px; } .trim-sel::after { right: 3px; }
+.trim-time { display: flex; justify-content: space-between; margin-top: 12px; font-size: 12px; color: var(--ink-muted); }
+
+/* Feature rows */
+.feature { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; padding: 4.25rem 0 6rem; }
+.feature.flip .feature-media { order: 2; }
+.feature-media { background: var(--surface-card); border-radius: var(--r-card); aspect-ratio: 1 / 1; display: grid; place-items: center; padding: 32px; position: relative; overflow: hidden; }
+.feature-text .h2 { margin: 8px 0 16px; }
+.check { list-style: none; margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+.check li { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; color: var(--ink-strong); }
+.check .ico { width: 18px; height: 18px; margin-top: 4px; }
+.blue-c .ico { color: var(--accent-blue); } .gold-c .ico { color: var(--accent-gold); }
+.green-c .ico { color: var(--accent-green); } .orange-c .ico { color: var(--accent-orange); }
+
+.uiwin { width: 100%; max-width: 380px; background: #fff; border-radius: 20px; padding: 16px; box-shadow: 0 0 0 1px rgb(0 0 0 / .05), 0 12px 32px rgb(60 45 30 / .08); }
+.uiwin-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.uiwin-head b { font-size: 14px; font-weight: 600; color: var(--ink-strong); letter-spacing: -0.15px; display: flex; align-items: center; gap: 8px; }
+.uiwin-head b svg { width: 16px; height: 16px; }
+.uiwin-head small { display: block; font-size: 12px; color: var(--ink-muted); font-weight: 400; margin-top: 2px; }
+
+/* Logo wall */
+.logos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 380px; }
+.logo {
+  display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 12px; border-radius: 12px;
+  background: #fff; box-shadow: 0 0 0 1px var(--hair); font-size: 14px; font-weight: 500; color: var(--ink-strong);
+  transition: box-shadow var(--ui) ease;
+}
+.logo svg { width: 20px; height: 20px; flex: none; }
+.logo.more { color: var(--ink-muted); justify-content: center; }
+.logo.lit { box-shadow: 0 0 0 1.5px var(--app-blue), 0 6px 16px rgb(20 141 255 / .12); }
+.mini-capsule { margin-top: 24px; width: 100%; max-width: 380px; height: 48px; border-radius: 24px; background: #fff; box-shadow: 0 0 0 1px var(--hair), 0 10px 24px rgb(60 45 30 / .08); display: flex; align-items: center; gap: 10px; padding: 0 16px; font-size: 14px; color: var(--ink-strong); white-space: nowrap; overflow: hidden; }
+.mini-capsule .ico { color: var(--ink-muted); }
+.mini-capsule .url { overflow: hidden; text-overflow: ellipsis; }
+.mini-capsule .fav { width: 16px; height: 16px; flex: none; margin-left: auto; }
+.logos-wrap { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+/* Playlist */
+.pl-item { display: grid; grid-template-columns: 48px 1fr 20px; gap: 12px; align-items: center; padding: 8px 0; }
+.pl-item + .pl-item { border-top: 1px solid var(--line); }
+.pl-item .thumb { width: 48px; height: 32px; border-radius: 6px; }
+.pl-item b { display: block; font-size: 12.5px; font-weight: 500; color: var(--ink-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.1px; }
+.pl-item .track { height: 4px; margin-top: 6px; }
+.pl-item .track i { background: var(--accent-green); transition: width 200ms linear; }
+.pl-state { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; }
+.pl-state.done { background: var(--accent-green); color: #fff; }
+.pl-state.done .ico { width: 12px; height: 12px; stroke-width: 3; }
+.pl-state.wait { box-shadow: inset 0 0 0 1.5px #ddd7cf; }
+.pl-count { font-size: 12px; color: var(--accent-green); }
+
+/* Convert */
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface-warm); border-radius: 10px; padding: 2px; position: relative; }
+.seg span { position: relative; z-index: 1; text-align: center; font-size: 13px; font-weight: 600; height: 30px; line-height: 30px; color: var(--ink-muted); transition: color var(--ui) ease; }
+.seg span.on { color: var(--ink-strong); }
+.seg .seg-pill { position: absolute; z-index: 0; top: 2px; bottom: 2px; left: 2px; height: auto; width: calc((100% - 4px) / 4); background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / .08); transition: transform var(--enter) var(--ease); }
+.preview-img { height: 160px; border-radius: 12px; margin-bottom: 12px; position: relative; overflow: hidden; }
+.preview-img > div { position: absolute; inset: 0; transition: opacity var(--enter) ease; }
+.file-tag { position: absolute; z-index: 2; top: 8px; left: 8px; display: flex; align-items: center; gap: 6px; background: rgb(255 255 255 / .92); border-radius: 6px; font-size: 11px; font-weight: 500; padding: 4px 8px 4px 6px; color: var(--ink-strong); }
+.file-tag .ico { width: 13px; height: 13px; color: var(--ink-muted); }
+.qual { margin-top: 16px; }
+.qual-top { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 500; color: var(--ink-body); margin-bottom: 8px; }
+.slider { height: 6px; border-radius: 3px; background: var(--surface-raised); position: relative; }
+.slider i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--accent-orange); transition: width var(--enter) var(--ease); }
+.slider b { position: absolute; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 .5px rgb(0 0 0 / .12), 0 1px 4px rgb(0 0 0 / .18); transition: left var(--enter) var(--ease); }
+.size-out { margin-top: 16px; display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ink-muted); }
+.size-out b { color: var(--accent-orange); font-weight: 500; }
+
+/* Warm band */
+.band { background: var(--surface-warm); }
+.band-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; padding: 80px 0 88px; }
+.band-item .ibox { width: 48px; height: 48px; border-radius: 14px; background: #fff; display: grid; place-items: center; margin-bottom: 20px; box-shadow: 0 0 0 1px rgb(0 0 0 / .04); }
+.band-item .ibox .ico { width: 22px; height: 22px; }
+.band-item h3 { font: 500 28px/32px var(--font-display); letter-spacing: -0.03em; color: var(--ink-strong); margin-bottom: 12px; }
+.band-item p { max-width: 26rem; }
+.band-item p + p { margin-top: 12px; }
+code { font: 500 0.88em/1 var(--font-mono); background: rgb(0 0 0 / .05); padding: 2px 5px; border-radius: 5px; letter-spacing: 0; }
+
+/* Install steps */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.step-media { background: var(--surface-card); border-radius: var(--r-card); height: 192px; display: grid; place-items: center; position: relative; overflow: hidden; margin-bottom: 20px; }
+.step-num { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--accent-blue); margin-bottom: 4px; }
+.step-num i { font-style: normal; width: 20px; height: 20px; border-radius: 50%; background: rgb(31 115 216 / .1); display: grid; place-items: center; font: 500 11px/1 var(--font-mono); }
+.step h3 { font-size: 17px; font-weight: 600; color: var(--ink-strong); letter-spacing: -0.22px; }
+.step p { font-size: 15px; line-height: 22px; color: var(--ink-2); margin-top: 4px; }
+.dmg { width: 236px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px rgb(0 0 0 / .06), 0 10px 30px rgb(60 45 30 / .1); }
+.dmg-bar { height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 10px; background: #f6f6f7; border-bottom: 1px solid rgb(0 0 0 / .06); font-size: 11px; font-weight: 600; color: rgb(0 0 0 / .7); }
+.dmg-bar .lights i { width: 9px; height: 9px; }
+.dmg-bar .lights { gap: 5px; margin-right: 6px; }
+.dmg-body { display: flex; align-items: center; justify-content: space-around; padding: 20px 8px 16px; }
+.dmg-body figure { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 10.5px; color: rgb(0 0 0 / .7); }
+.dmg-body img, .dmg-body .folder { width: 52px; height: 52px; }
+.dmg-arrow { color: #b2a79a; width: 32px; height: 32px; }
+.dialog { width: 216px; background: rgb(246 246 247 / .98); border-radius: 14px; padding: 16px; box-shadow: 0 0 0 .5px rgb(0 0 0 / .14), 0 10px 30px rgb(60 45 30 / .12); text-align: center; }
+.dialog img { width: 40px; height: 40px; margin: 0 auto 8px; }
+.dialog b { font-size: 12.5px; font-weight: 600; color: var(--ink-strong); display: block; letter-spacing: -0.1px; }
+.dialog small { display: block; font-size: 10.5px; line-height: 14px; color: var(--ink-muted); margin: 4px 0 12px; }
+.dbtns { display: flex; gap: 6px; }
+.dbtns span { flex: 1; height: 24px; line-height: 24px; border-radius: 6px; font-size: 11px; font-weight: 500; background: #fff; box-shadow: 0 0 0 .5px rgb(0 0 0 / .14); color: var(--ink-strong); }
+.dbtns span.primary { background: var(--app-blue); color: #fff; box-shadow: none; }
+.paste-demo { width: 86%; height: 48px; border-radius: 24px; background: #fff; box-shadow: 0 0 0 1px var(--hair), 0 10px 24px rgb(60 45 30 / .08); display: flex; align-items: center; gap: 10px; padding: 0 8px 0 16px; font-size: 13.5px; color: var(--ink-strong); }
+.paste-demo .ico { color: var(--ink-muted); }
+.kbd { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; }
+.kbd kbd { min-width: 22px; height: 22px; padding: 0 5px; border-radius: 5px; background: var(--surface-warm); box-shadow: inset 0 -1px 0 rgb(0 0 0 / .1); font: 500 12px/22px var(--font-body); color: var(--ink-body); text-align: center; }
+
+/* FAQ */
+.faq-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 64px; }
+.faq-list { border-top: 1px solid var(--line); }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { list-style: none; cursor: pointer; display: flex; gap: 16px; align-items: flex-start; font-size: 19px; line-height: 28px; font-weight: 500; letter-spacing: -0.3px; color: var(--ink-strong); padding: 20px 0; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary .ico { width: 18px; height: 18px; margin-top: 5px; color: var(--accent-orange); stroke-width: 2.2; transition: transform var(--ui) var(--ease); }
+.faq details[open] summary .ico { transform: rotate(45deg); }
+.faq .answer { padding: 0 0 24px 34px; max-width: 36rem; }
+.faq .answer p + p { margin-top: 12px; }
+.faq .answer a { color: var(--accent-orange); font-weight: 500; }
+
+/* CTA + footer */
+.cta { background: var(--surface-warm); overflow: hidden; }
+.cta-inner { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 32px; padding: 80px 0 0; }
+.cta-copy { padding-bottom: 80px; }
+.cta-copy .lead { margin: 16px 0 24px; max-width: 26rem; }
+.cta-copy .link-cta { color: var(--accent-blue); font-size: 17px; }
+.cta-art { align-self: end; }
+.footer { padding: 48px 0 56px; }
+.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
+.footer h4 { font-size: 14px; font-weight: 600; color: var(--ink-strong); margin-bottom: 12px; letter-spacing: -0.09px; }
+.footer ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.footer li a { font-size: 15px; color: var(--ink-muted); transition: color var(--fast) ease; }
+.footer li a:hover { color: var(--ink-strong); }
+.footer-base { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 13px; color: var(--ink-muted); }
+.footer-base svg { width: 18px; height: 18px; }
+
+/* One entrance: a short rise from a visible state */
+/* Motion: one load sequence for the hero, one gentle fade-and-rise for blocks as they arrive */
+.reveal { transition: opacity 600ms var(--ease-quart), transform 800ms var(--ease); transition-delay: var(--d, 0ms); }
+.js .reveal.pending { opacity: 0; transform: translateY(16px); }
+.check li { transition: opacity 500ms var(--ease-quart), transform 600ms var(--ease); transition-delay: calc(var(--i, 0) * 60ms + 200ms); }
+.js .reveal.pending .check li { opacity: 0; transform: translateY(6px); }
+.js .load { animation: rise 900ms var(--ease) both; animation-delay: var(--d, 0ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+.js .art.load { animation-name: artIn; animation-duration: 1200ms; }
+@keyframes artIn { from { opacity: 0; transform: translateY(18px) scale(.96); } }
+.btn-dark .ico { transition: transform var(--ui) var(--ease); }
+.btn-dark:hover .ico { transform: translateY(2px); }
+.btn-light:hover .ico { transform: translateX(2px); }
+.btn-light .ico { transition: transform var(--ui) var(--ease); }
+.tile-media, .feature-media { transition: background-color var(--ui) ease; }
+.faq details::details-content { height: 0; overflow: clip; transition: height 360ms var(--ease), content-visibility 360ms allow-discrete; }
+.faq details[open]::details-content { height: auto; }
+.faq { interpolate-size: allow-keywords; }
+.faq summary { transition: color var(--fast) ease; }
+.faq summary:hover { color: #000; }
+/* Lenis smooth scroll */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Thumbnails: painted frames (CSS) */
+.ph { position: absolute; inset: 0; }
+.ph i { position: absolute; display: block; }
+
+/* Responsive */
+@media (max-width: 920px) { .bento { gap: 28px 20px; } .feature { gap: 48px; } .art { opacity: .5; } }
+@media (max-width: 880px) {
+  .bento { grid-template-columns: repeat(2, 1fr); grid-template-areas: "left a" "left b" "c d"; }
+  .steps { grid-template-columns: 1fr; max-width: 30rem; margin: 0 auto; }
+}
+@media (max-width: 768px) {
+  body { font-size: 15px; line-height: 22px; }
+  .sec { padding: 40px 0 48px; }
+  .sec-head { text-align: center; margin: 0 auto 32px; }
+  .feature, .feature.flip { grid-template-columns: 1fr; gap: 32px; padding: 40px 0 48px; text-align: center; }
+  .feature.flip .feature-media { order: 0; }
+  .feature-media { aspect-ratio: auto; min-height: 340px; padding: 24px 16px; }
+  .check { align-items: center; } .check li { text-align: left; }
+  .band-grid, .cta-inner { grid-template-columns: 1fr; gap: 40px; text-align: center; padding-top: 48px; }
+  .band-grid { padding-bottom: 48px; }
+  .band-item .ibox, .band-item p { margin-left: auto; margin-right: auto; }
+  .faq-grid { grid-template-columns: 1fr; gap: 24px; }
+  .faq-grid .sec-head { text-align: left; margin: 0; }
+  .cta-copy { padding-bottom: 0; } .cta-art { max-width: 380px; margin: 0 auto; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .art { display: none; }
+  .hero { padding-top: 56px; }
+  /* compact scene: phone column */
+  .scene { aspect-ratio: 4 / 5; }
+  .browser { left: 4%; width: 120%; top: 8%; }
+  .bpage { grid-template-columns: 1fr; }
+  .upnext { display: none; }
+  .app { left: 4%; width: 92%; top: 40%; }
+  .hud { bottom: 6%; }
+  .toast { right: auto; left: 50%; bottom: 6%; transform: translate(-50%, 6px); }
+  .toast.on { transform: translate(-50%, 0); }
+  .menubar .hide-s { display: none; }
+}
+@media (max-width: 720px) {
+  .nav-links, .gh-link { display: none; }
+  .bento { grid-template-columns: 1fr; grid-template-areas: none; }
+  .bento > :nth-child(1) { grid-area: auto; }
+}
+@media (max-width: 580px) {
+  .h-hero { font-size: 44px; line-height: 48px; }
+  .h2 { font-size: 34px; line-height: 38px; }
+  .hero-actions { flex-direction: column; align-items: center; }
+  .qrow { grid-template-columns: repeat(2, 1fr); }
+  .footer-base { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 420px) { .h-hero { font-size: 36px; line-height: 40px; } .logos { grid-template-columns: repeat(2, 1fr); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  html { scroll-behavior: auto; }
+  .js .load, .js .reveal.pending, .js .reveal.pending .check li { animation: none; opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="b-apple" viewBox="0 0 24 24"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></symbol>
+<symbol id="b-github" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></symbol>
+<symbol id="b-instagram" viewBox="0 0 24 24"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></symbol>
+<symbol id="b-pinterest" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></symbol>
+<symbol id="b-reddit" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 3.314 1.343 6.314 3.515 8.485l-2.286 2.286C.775 23.225 1.097 24 1.738 24H12c6.627 0 12-5.373 12-12S18.627 0 12 0Zm4.388 3.199c1.104 0 1.999.895 1.999 1.999 0 1.105-.895 2-1.999 2-.946 0-1.739-.657-1.947-1.539v.002c-1.147.162-2.032 1.15-2.032 2.341v.007c1.776.067 3.4.567 4.686 1.363.473-.363 1.064-.58 1.707-.58 1.547 0 2.802 1.254 2.802 2.802 0 1.117-.655 2.081-1.601 2.531-.088 3.256-3.637 5.876-7.997 5.876-4.361 0-7.905-2.617-7.998-5.87-.954-.447-1.614-1.415-1.614-2.538 0-1.548 1.255-2.802 2.803-2.802.645 0 1.239.218 1.712.585 1.275-.79 2.881-1.291 4.64-1.365v-.01c0-1.663 1.263-3.034 2.88-3.207.188-.911.993-1.595 1.959-1.595Zm-8.085 8.376c-.784 0-1.459.78-1.506 1.797-.047 1.016.64 1.429 1.426 1.429.786 0 1.371-.369 1.418-1.385.047-1.017-.553-1.841-1.338-1.841Zm7.406 0c-.786 0-1.385.824-1.338 1.841.047 1.017.634 1.385 1.418 1.385.785 0 1.473-.413 1.426-1.429-.046-1.017-.721-1.797-1.506-1.797Zm-3.703 4.013c-.974 0-1.907.048-2.77.135-.147.015-.241.168-.183.305.483 1.154 1.622 1.964 2.953 1.964 1.33 0 2.47-.81 2.953-1.964.057-.137-.037-.29-.184-.305-.863-.087-1.795-.135-2.769-.135Z"/></symbol>
+<symbol id="b-soundcloud" viewBox="0 0 24 24"><path d="M23.999 14.165c-.052 1.796-1.612 3.169-3.4 3.169h-8.18a.68.68 0 0 1-.675-.683V7.862a.747.747 0 0 1 .452-.724s.75-.513 2.333-.513a5.364 5.364 0 0 1 2.763.755 5.433 5.433 0 0 1 2.57 3.54c.282-.08.574-.121.868-.12.884 0 1.73.358 2.347.992s.948 1.49.922 2.373ZM10.721 8.421c.247 2.98.427 5.697 0 8.672a.264.264 0 0 1-.53 0c-.395-2.946-.22-5.718 0-8.672a.264.264 0 0 1 .53 0ZM9.072 9.448c.285 2.659.37 4.986-.006 7.655a.277.277 0 0 1-.55 0c-.331-2.63-.256-5.02 0-7.655a.277.277 0 0 1 .556 0Zm-1.663-.257c.27 2.726.39 5.171 0 7.904a.266.266 0 0 1-.532 0c-.38-2.69-.257-5.21 0-7.904a.266.266 0 0 1 .532 0Zm-1.647.77a26.108 26.108 0 0 1-.008 7.147.272.272 0 0 1-.542 0 27.955 27.955 0 0 1 0-7.147.275.275 0 0 1 .55 0Zm-1.67 1.769c.421 1.865.228 3.5-.029 5.388a.257.257 0 0 1-.514 0c-.21-1.858-.398-3.549 0-5.389a.272.272 0 0 1 .543 0Zm-1.655-.273c.388 1.897.26 3.508-.01 5.412-.026.28-.514.283-.54 0-.244-1.878-.347-3.54-.01-5.412a.283.283 0 0 1 .56 0Zm-1.668.911c.4 1.268.257 2.292-.026 3.572a.257.257 0 0 1-.514 0c-.241-1.262-.354-2.312-.023-3.572a.283.283 0 0 1 .563 0Z"/></symbol>
+<symbol id="b-tiktok" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></symbol>
+<symbol id="b-twitch" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></symbol>
+<symbol id="b-vimeo" viewBox="0 0 24 24"><path d="M23.9765 6.4168c-.105 2.338-1.739 5.5429-4.894 9.6088-3.2679 4.247-6.0258 6.3699-8.2898 6.3699-1.409 0-2.578-1.294-3.553-3.881l-1.9179-7.1138c-.719-2.584-1.488-3.878-2.312-3.878-.179 0-.806.378-1.8809 1.132l-1.129-1.457a315.06 315.06 0 003.501-3.1279c1.579-1.368 2.765-2.085 3.5539-2.159 1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.5069.5389 2.45 1.1309 3.674 1.7759 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.8679 3.434-5.7568 6.7619-5.6368 2.4729.06 3.6279 1.664 3.4929 4.7969z"/></symbol>
+<symbol id="b-x" viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></symbol>
+<symbol id="b-youtube" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-arrow-right" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></symbol>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-check" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M20 6 9 17l-5-5" /></symbol>
+<symbol id="i-command" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-command" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" /></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-copy" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></symbol>
+<symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-download" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="7 10 12 15 17 10" /> <line x1="12" x2="12" y1="15" y2="3" /></symbol>
+<symbol id="i-ellipsis" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-ellipsis" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <circle cx="12" cy="12" r="1" /> <circle cx="19" cy="12" r="1" /> <circle cx="5" cy="12" r="1" /></symbol>
+<symbol id="i-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-file-text" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /> <path d="M14 2v4a2 2 0 0 0 2 2h4" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-folder" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></symbol>
+<symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-image" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <rect width="18" height="18" x="3" y="3" rx="2" ry="2" /> <circle cx="9" cy="9" r="2" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></symbol>
+<symbol id="i-images" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-images" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M18 22H4a2 2 0 0 1-2-2V6" /> <path d="m22 13-1.296-1.296a2.41 2.41 0 0 0-3.408 0L11 18" /> <circle cx="12" cy="8" r="2" /> <rect width="16" height="16" x="6" y="2" rx="2" /></symbol>
+<symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-keyboard" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10 8h.01" /> <path d="M12 12h.01" /> <path d="M14 8h.01" /> <path d="M16 12h.01" /> <path d="M18 8h.01" /> <path d="M6 8h.01" /> <path d="M7 16h10" /> <path d="M8 12h.01" /> <rect width="20" height="16" x="2" y="4" rx="2" /></symbol>
+<symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-link" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /> <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></symbol>
+<symbol id="i-list-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-list-video" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12 12H3" /> <path d="M16 6H3" /> <path d="M12 18H3" /> <path d="m16 12 5 3-5 3v-6Z" /></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-lock" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <path d="M7 11V7a5 5 0 0 1 10 0v4" /></symbol>
+<symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-play" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <polygon points="6 3 20 12 6 21 6 3" /></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-plus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M5 12h14" /> <path d="M12 5v14" /></symbol>
+<symbol id="i-refresh-cw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-refresh-cw" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol>
+<symbol id="i-scissors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-scissors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <circle cx="6" cy="6" r="3" /> <path d="M8.12 8.12 12 12" /> <path d="M20 4 8.12 15.88" /> <circle cx="6" cy="18" r="3" /> <path d="M14.8 14.8 20 20" /></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-settings" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /> <circle cx="12" cy="12" r="3" /></symbol>
+<symbol id="i-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-shield-check" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></symbol>
+<symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-star" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></symbol>
+<symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-terminal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <polyline points="4 17 10 11 4 5" /> <line x1="12" x2="20" y1="19" y2="19" /></symbol>
+<symbol id="i-trash-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-trash-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M3 6h18" /> <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /> <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /> <line x1="10" x2="10" y1="11" y2="17" /> <line x1="14" x2="14" y1="11" y2="17" /></symbol>
+<symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-x" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><svg class="lucide lucide-zap" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" /></symbol>
+  <!-- Original mascots -->
+  <symbol id="m-file" viewBox="0 0 120 150">
+    <path d="M38 118 L28 146 M78 118 L88 146 M14 58 L-2 40 M106 62 L122 76" stroke="#121212" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M22 8 h56 l28 28 v76 a10 10 0 0 1 -10 10 h-74 a10 10 0 0 1 -10 -10 v-94 a10 10 0 0 1 10 -10z" fill="#4DAFFF"/>
+    <path d="M78 8 v18 a10 10 0 0 0 10 10 h18z" fill="#8ECCFF"/>
+    <circle cx="44" cy="66" r="4.5" fill="#121212"/><circle cx="72" cy="66" r="4.5" fill="#121212"/>
+    <path d="M48 80 q10 9 20 0" stroke="#121212" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <symbol id="m-film" viewBox="0 0 130 110">
+    <path d="M40 92 L34 108 M90 92 L96 108" stroke="#121212" stroke-width="3" stroke-linecap="round"/>
+    <rect x="6" y="6" width="118" height="88" rx="16" fill="#FFCF7B"/>
+    <g fill="#F5B442"><rect x="16" y="14" width="10" height="8" rx="2"/><rect x="34" y="14" width="10" height="8" rx="2"/><rect x="52" y="14" width="10" height="8" rx="2"/><rect x="70" y="14" width="10" height="8" rx="2"/><rect x="88" y="14" width="10" height="8" rx="2"/><rect x="106" y="14" width="10" height="8" rx="2"/><rect x="16" y="78" width="10" height="8" rx="2"/><rect x="34" y="78" width="10" height="8" rx="2"/><rect x="52" y="78" width="10" height="8" rx="2"/><rect x="70" y="78" width="10" height="8" rx="2"/><rect x="88" y="78" width="10" height="8" rx="2"/><rect x="106" y="78" width="10" height="8" rx="2"/></g>
+    <path d="M46 46 q6 -6 12 0 M72 46 q6 -6 12 0 M56 58 q9 8 18 0" stroke="#121212" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <symbol id="m-photo" viewBox="0 0 100 100">
+    <rect x="4" y="4" width="92" height="92" rx="20" fill="#5F5DE7"/>
+    <circle cx="70" cy="30" r="10" fill="#FFCF7B"/>
+    <path d="M4 76 L34 46 L58 70 L70 58 L96 84 a20 12 0 0 1 -20 12 H24 a20 20 0 0 1 -20 -20z" fill="#8ECCFF"/>
+  </symbol>
+  <symbol id="m-pdf" viewBox="0 0 80 100"><path d="M10 2 h44 l24 24 v62 a10 10 0 0 1 -10 10 h-58 a10 10 0 0 1 -10 -10 v-76 a10 10 0 0 1 10 -10z" fill="#FF5310"/><path d="M54 2 v14 a10 10 0 0 0 10 10 h14z" fill="#FF8A5C"/><rect x="14" y="52" width="40" height="6" rx="3" fill="#fff" opacity=".85"/><rect x="14" y="64" width="52" height="6" rx="3" fill="#fff" opacity=".6"/><rect x="14" y="76" width="30" height="6" rx="3" fill="#fff" opacity=".6"/></symbol>
+  <symbol id="s-cursor" viewBox="0 0 24 24"><path d="M5.5 3.2 L5.5 19.6 L9.6 15.7 L12.5 21.8 L15.3 20.5 L12.5 14.5 L18.2 14.3 Z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+</defs>
+</svg>
+
+<header class="nav">
+  <div class="frame nav-inner">
+    <a class="brand" href="#top" aria-label="Download It home"><img src="app-icon.png" alt="" />Download It</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#features">Features</a><a href="#install">Install</a><a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-right">
+      <a class="gh-link" href="https://github.com/arnabbagxd/Downloader" target="_blank" rel="noopener"><svg class="ico"><use href="#b-github"/></svg>GitHub<b id="star-count" hidden></b></a>
+      <a class="btn btn-dark btn-sm" href="https://github.com/arnabbagxd/Downloader/releases/latest/download/DownloadIt-macos-universal.dmg">Download</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="art art-l load" style="--d:500ms" aria-hidden="true">
+    <svg style="left:40px;top:56px;width:132px;height:165px;transform:rotate(-8deg)"><use href="#m-file"/></svg>
+    <svg style="left:176px;top:236px;width:56px;height:70px;transform:rotate(12deg)"><use href="#m-pdf"/></svg>
+  </div>
+  <div class="art art-r load" style="--d:620ms" aria-hidden="true">
+    <svg style="left:84px;top:40px;width:144px;height:122px;transform:rotate(6deg)"><use href="#m-film"/></svg>
+    <svg style="left:32px;top:220px;width:76px;height:76px;transform:rotate(-8deg)"><use href="#m-photo"/></svg>
+  </div>
+
+  <div class="container hero-copy">
+    <h1 class="display h-hero load">Paste a link.<br />Keep the file.</h1>
+    <p class="lead load" style="--d:90ms">A small, native Mac app that saves video, images and PDFs from almost any site. No setup, no Homebrew, no Terminal.</p>
+    <div class="hero-actions load" style="--d:180ms">
+      <a class="btn btn-dark" href="https://github.com/arnabbagxd/Downloader/releases/latest/download/DownloadIt-macos-universal.dmg"><svg class="ico"><use href="#i-download"/></svg>Download for Mac</a>
+      <a class="btn btn-light" href="#features"><svg class="ico"><use href="#i-play"/></svg>See how it works</a>
+    </div>
+  </div>
+
+  <div class="scene-wrap load" style="--d:320ms">
+    <div class="scene" id="scene" role="img" aria-label="A link is copied from a YouTube page in the browser, Download It is summoned with Command Shift 6, the link is pasted, 1080p is picked, and the video lands in the app's history, copied to the clipboard.">
+      <svg class="wall" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="1600" height="900" fill="#cfe5ff"/>
+        <path d="M0 420 C260 330 520 360 760 420 C1020 486 1300 380 1600 330 V900 H0Z" fill="#a8d1ff"/>
+        <path d="M0 560 C300 470 560 520 820 580 C1100 640 1340 540 1600 500 V900 H0Z" fill="#7cb9ff"/>
+        <path d="M0 700 C280 640 600 690 900 740 C1180 786 1400 700 1600 680 V900 H0Z" fill="#4c9cf7"/>
+        <path d="M0 820 C340 780 700 820 1000 850 C1260 876 1440 830 1600 820 V900 H0Z" fill="#2f83ea"/>
+      </svg>
+      <div class="menubar" aria-hidden="true">
+        <svg class="ico"><use href="#i-download"/></svg><b>Download It</b><span class="hide-s">File</span><span class="hide-s">Edit</span><span class="hide-s">Window</span><span class="hide-s">Help</span>
+        <span class="right"><svg class="ico hide-s"><use href="#i-download"/></svg><span class="mono" id="clock" style="font-family:var(--font-body)">Tue 9:41</span></span>
+      </div>
+
+      <div class="browser" aria-hidden="true">
+        <div class="bchrome">
+          <div class="lights"><i></i><i></i><i></i></div>
+          <div class="addr" id="addr"><svg class="ico"><use href="#i-lock"/></svg><svg class="fav" id="b-fav"><use href="#b-youtube" fill="#FF0000"/></svg><span class="url" id="b-url">youtube.com/watch?v=k3Lm9xQe2</span></div>
+        </div>
+        <div class="bpage">
+          <div>
+            <div class="player"><div class="frame-img" id="b-frame"></div><div class="bar"><i></i></div></div>
+            <p class="ptitle" id="b-title">Live studio session, full set</p>
+            <div class="pmeta"><span class="av" style="background:#f5b442"></span><div class="lines"><span class="ln" style="width:38%"></span><span class="ln" style="width:22%"></span></div></div>
+            <div class="desc"><span class="ln" style="width:30%;background:rgb(0 0 0 / .14)"></span><span class="ln"></span><span class="ln" style="width:92%"></span><span class="ln" style="width:64%"></span></div>
+          </div>
+          <div class="upnext">
+            <div class="item"><div class="t" data-thumb="harbour"></div><div class="lines"><span class="ln"></span><span class="ln" style="width:70%"></span></div></div>
+            <div class="item"><div class="t" data-thumb="walk"></div><div class="lines"><span class="ln"></span><span class="ln" style="width:60%"></span></div></div>
+            <div class="item"><div class="t" data-thumb="lisbon"></div><div class="lines"><span class="ln"></span><span class="ln" style="width:76%"></span></div></div>
+            <div class="item"><div class="t" data-thumb="ceramics"></div><div class="lines"><span class="ln"></span><span class="ln" style="width:52%"></span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="app" id="app" aria-hidden="true">
+        <div class="capsule glass" id="capsule">
+          <svg class="ico"><use href="#i-link"/></svg>
+          <div class="field is-ph" id="field">Paste a video or image link — Instagram, X, YouTube…</div>
+          <svg class="pie" id="pie" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11.5" fill="none" stroke="rgb(0 0 0 / .12)" stroke-width="2.4"/><path id="pie-path" fill="#148DFF" d=""/></svg>
+          <svg class="gear"><use href="#i-settings"/></svg>
+        </div>
+        <div class="slot">
+          <div class="card glass probe float-card off" id="probe"><span class="spinner"></span><span>Finding available resolutions…</span></div>
+          <div class="card glass float-card off" id="pick">
+            <div class="pick-head"><div><b>Choose quality</b><small id="pick-sub">YouTube · 4 qualities available</small></div><span class="xbtn"><svg class="ico"><use href="#i-x"/></svg></span></div>
+            <div class="qrow" id="qrow"></div>
+          </div>
+          <div class="card glass history" id="history"></div>
+        </div>
+      </div>
+
+      <div class="hud" id="hud" aria-hidden="true"></div>
+      <div class="toast" id="toast" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg>Copied to clipboard</div>
+      <div class="cursor" id="cursor" aria-hidden="true"><svg width="22" height="22"><use href="#s-cursor"/></svg></div>
+    </div>
+  </div>
+  <p class="hero-meta"><span>Free and open source</span><span id="ver">v1.3.0</span><span>macOS 14 or later</span><span>Apple silicon and Intel</span></p>
+</section>
+
+<section id="features">
+  <div class="container sec">
+    <div class="sec-head reveal">
+      <p class="eyebrow blue">Details that matter</p>
+      <h2 class="display h2">Small app.<br />Good manners.</h2>
+      <p class="lead">Download It floats above everything like Spotlight, does one job and gets out of the way. The small things are where it shows.</p>
+    </div>
+    <div class="bento">
+      <article class="tile reveal">
+        <div class="tile-media" style="padding:16px;place-items:stretch;align-content:center"><div><div class="mini-head">History<span class="mono">128 items · 6.4 GB</span></div><div class="mini-list" id="b-list"></div></div></div>
+        <div><h3>A history you can use.</h3><p>Every download keeps its thumbnail. Copy it again, trim it, show it in Finder, reopen the source, or swipe it away.</p></div>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-media"><div class="keys" aria-hidden="true"><span class="key" id="k1">⌘</span><span class="key" id="k2">⇧</span><span class="key" id="k3">6</span></div><span class="tile-cap" id="k-cap">Works from any app</span></div>
+        <div><h3>One shortcut away.</h3><p>A global hotkey brings the window forward over whatever you're doing. Change it to anything you like.</p></div>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-media">
+          <svg class="bigpie" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" fill="none" stroke="#ebe6df" stroke-width="2"/><path id="b-pie" fill="#148DFF" d=""/></svg>
+          <span class="tile-cap mono" id="b-pie-label">31.6 of 48.0 MB</span>
+        </div>
+        <div><h3>Progress you can read.</h3><p>A pie that fills as the file arrives. Real progress, never a spinner with no context.</p></div>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-media">
+          <div class="remux" aria-hidden="true">
+            <div class="bar-row"><span>Remux</span><div class="track"><i id="r1" style="background:var(--app-blue);width:100%"></i></div><em class="mono" id="r1t">3.2s</em></div>
+            <div class="bar-row"><span>Re-encode</span><div class="track"><i id="r2" style="background:#cdc6bc;width:42%"></i></div><em class="mono" id="r2t">~4 min</em></div>
+          </div>
+          <span class="tile-cap mono">48 MB · 1080p · same quality</span>
+        </div>
+        <div><h3>Seconds, not minutes.</h3><p>Video is repackaged into MP4 instead of re-encoded, so most downloads finish almost at once.</p></div>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-media">
+          <div class="trim" aria-hidden="true">
+            <div class="film" id="film"></div>
+            <div class="trim-time mono"><span id="t-in">0:04</span><span id="t-out">0:21</span></div>
+          </div>
+        </div>
+        <div><h3>Trim before you share.</h3><p>Scrub to an in and out point, then save the clip or copy it straight to your clipboard.</p></div>
+      </article>
+    </div>
+  </div>
+
+  <div class="container"><hr class="rule" /></div>
+  <div class="container">
+    <div class="feature">
+      <div class="feature-media reveal">
+        <div class="logos-wrap">
+          <div class="logos" id="logos"></div>
+          <div class="mini-capsule"><svg class="ico"><use href="#i-link"/></svg><span class="url" id="f-url">youtube.com/watch?v=k3Lm9xQe2</span><svg class="fav" id="f-fav"><use href="#b-youtube" fill="#FF0000"/></svg></div>
+        </div>
+      </div>
+      <div class="feature-text reveal">
+        <p class="eyebrow blue">Anywhere</p>
+        <h2 class="display h2">Thousands of sites.<br />One text field.</h2>
+        <p class="lead">Paste a link, drag one onto the window, or drop a file. If a site has media worth keeping, Download It can almost certainly fetch it.</p>
+        <ul class="check blue-c">
+          <li><svg class="ico"><use href="#i-check"/></svg>YouTube, Instagram, X, TikTok, Vimeo, Reddit</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>Paste, drag and drop, or copy a file</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>The finished file lands on your clipboard</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container"><hr class="rule" /></div>
+  <div class="container">
+    <div class="feature flip">
+      <div class="feature-media reveal">
+        <div class="uiwin" aria-hidden="true">
+          <div class="uiwin-head"><div><b><svg><use href="#b-vimeo" fill="#1AB7EA"/></svg>Choose quality</b><small>Vimeo · 6 qualities available</small></div><span class="xbtn"><svg class="ico"><use href="#i-x"/></svg></span></div>
+          <div class="qrow" id="g-qrow" style="grid-template-columns:repeat(3,1fr)"></div>
+        </div>
+      </div>
+      <div class="feature-text reveal">
+        <p class="eyebrow gold">Honest</p>
+        <h2 class="display h2">The real quality.<br />Not a guess.</h2>
+        <p class="lead">Before anything downloads, the app checks what the link actually offers and shows every option as a box. Pick one and it starts.</p>
+        <ul class="check gold-c">
+          <li><svg class="ico"><use href="#i-check"/></svg>Real resolutions, up to 4K and 8K</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>No upscaled “HD” that isn't</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>Saved as a plain MP4 that plays anywhere</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container"><hr class="rule" /></div>
+  <div class="container">
+    <div class="feature">
+      <div class="feature-media reveal">
+        <div class="uiwin" aria-hidden="true">
+          <div class="uiwin-head"><div><b><svg><use href="#b-youtube" fill="#FF0000"/></svg>Studio sessions</b><small>Playlist · downloading every video</small></div><span class="pl-count mono" id="p-count">5 / 5</span></div>
+          <div id="p-list"></div>
+        </div>
+      </div>
+      <div class="feature-text reveal">
+        <p class="eyebrow green">Bulk</p>
+        <h2 class="display h2">Whole playlists.<br />Whole boards.</h2>
+        <p class="lead">Paste a playlist, a channel, a Pinterest board or an Instagram profile. Download It offers to grab all of it and shows each item as it lands.</p>
+        <ul class="check green-c">
+          <li><svg class="ico"><use href="#i-check"/></svg>Playlists and channels, with per-item progress</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>Pinterest boards and Idea Pins</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>Instagram profiles, every post</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>One tidy .zip, or separate files</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container"><hr class="rule" /></div>
+  <div class="container">
+    <div class="feature flip">
+      <div class="feature-media reveal">
+        <div class="uiwin" aria-hidden="true">
+          <div class="preview-img">
+            <div id="c-photo" data-thumb="lisbon" style="opacity:1"></div>
+            <div id="c-pdf" style="opacity:0;background:#efe9df;display:grid;place-items:center"><div style="width:96px;height:128px;background:#fff;border-radius:4px;box-shadow:0 2px 8px rgb(0 0 0 / .1);padding:12px;display:flex;flex-direction:column;gap:6px"><span class="ln" style="width:70%;background:#121212;height:6px"></span><span class="ln"></span><span class="ln"></span><span class="ln" style="width:80%"></span><span style="height:36px;border-radius:3px;background:#a8d1ff;margin:2px 0"></span><span class="ln"></span><span class="ln" style="width:60%"></span></div></div>
+            <span class="file-tag"><svg class="ico" id="c-tag-ico"><use href="#i-image"/></svg><span id="c-tag">lisbon-morning.heic</span></span>
+          </div>
+          <div class="seg" id="c-seg"><span class="seg-pill" id="c-pill"></span><span class="on">JPG</span><span>PNG</span><span>WebP</span><span>AVIF</span></div>
+          <div class="qual"><div class="qual-top"><span>Quality</span><span class="mono" id="c-q">82%</span></div><div class="slider"><i id="c-fill" style="width:82%"></i><b id="c-knob" style="left:82%"></b></div></div>
+          <div class="size-out mono"><span id="c-from">4.8 MB</span><span>→ <b id="c-size">612 KB</b></span></div>
+        </div>
+      </div>
+      <div class="feature-text reveal">
+        <p class="eyebrow orange">Convert</p>
+        <h2 class="display h2">Images and PDFs,<br />any way you like.</h2>
+        <p class="lead">Turn any image into the format you need, or drop in a PDF and get every page back as its own picture. Works on downloads and on files already on your Mac.</p>
+        <ul class="check orange-c">
+          <li><svg class="ico"><use href="#i-check"/></svg>JPG, PNG, WebP or AVIF</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>A quality slider for lossy formats</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>PDF to images, one page each</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="container band-grid">
+    <div class="band-item reveal">
+      <div class="ibox"><svg class="ico" style="color:var(--accent-blue)"><use href="#i-shield-check"/></svg></div>
+      <h3>Private by default.</h3>
+      <p>Everything runs on your Mac. Your history, preferences and thumbnails never leave it, and nothing about what you download is collected.</p>
+      <p class="small muted">The app goes online for three things only: the media you ask for, update checks on GitHub, and keeping its helpers current.</p>
+    </div>
+    <div class="band-item reveal">
+      <div class="ibox"><svg class="ico" style="color:var(--accent-orange)"><use href="#i-terminal"/></svg></div>
+      <h3>No Terminal. Ever.</h3>
+      <p>Under the hood it runs <code>yt-dlp</code> and <code>ffmpeg</code>. On first launch it fetches them for you, about 60 MB, once.</p>
+      <p class="small muted">Already have them through Homebrew? Download It uses yours.</p>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="container sec">
+    <div class="sec-head reveal">
+      <p class="eyebrow blue">Install</p>
+      <h2 class="display h2">Ready in a minute.<br />Honestly.</h2>
+      <p class="lead">Download It is free and not on the App Store, so there's one extra click the first time. Here is the whole thing.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-media">
+          <div class="dmg" aria-hidden="true">
+            <div class="dmg-bar"><div class="lights"><i></i><i></i><i></i></div>Download It</div>
+            <div class="dmg-body">
+              <figure><img src="app-icon.png" alt="" />Download It</figure>
+              <svg class="dmg-arrow"><use href="#i-arrow-right"/></svg>
+              <figure><svg class="folder" viewBox="0 0 52 52"><path d="M3 11a5 5 0 0 1 5-5h11l5 5h20a5 5 0 0 1 5 5v24a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z" fill="#7DC4FF"/><path d="M3 18h46v22a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z" fill="#4DAFFF"/><path d="M19 37 l7-14 7 14 M21.5 32 h9" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Applications</figure>
+            </div>
+          </div>
+        </div>
+        <p class="step-num"><i>1</i>Download</p>
+        <h3>Open the .dmg and drag.</h3>
+        <p>Open <code>DownloadIt-macos-universal.dmg</code> and drag the app into Applications.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-media">
+          <div class="dialog" aria-hidden="true">
+            <img src="app-icon.png" alt="" />
+            <b>Open “Download It”?</b>
+            <small>Privacy &amp; Security lets you open apps from outside the App Store</small>
+            <div class="dbtns"><span>Cancel</span><span class="primary">Open Anyway</span></div>
+          </div>
+        </div>
+        <p class="step-num"><i>2</i>Allow once</p>
+        <h3>Click Open Anyway.</h3>
+        <p>The app isn't notarized by Apple yet, so macOS asks once. About ten seconds, and never again.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-media">
+          <div class="paste-demo" aria-hidden="true">
+            <svg class="ico"><use href="#i-link"/></svg><span>Paste a link</span>
+            <span class="kbd"><kbd>⌘</kbd><kbd>V</kbd></span>
+          </div>
+        </div>
+        <p class="step-num"><i>3</i>Paste</p>
+        <h3>Paste your first link.</h3>
+        <p>The first run sets up its helpers on its own. After that, updates arrive inside the app.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="faq">
+  <div class="container"><hr class="rule" /></div>
+  <div class="container sec faq-grid">
+    <div class="sec-head reveal" style="text-align:left"><h2 class="display h2">Questions,<br />answered.</h2></div>
+    <div class="faq-list reveal">
+      <details open>
+        <summary><svg class="ico"><use href="#i-plus"/></svg>Is it safe? Why does macOS warn me?</summary>
+        <div class="answer">
+          <p>The warning appears because the app isn't notarized through Apple's paid developer program yet, not because anything is wrong. It's the same for most free apps shipped outside the App Store.</p>
+          <p>The source code is public on <a href="https://github.com/arnabbagxd/Downloader" target="_blank" rel="noopener">GitHub</a>, so you can read it or build it yourself.</p>
+        </div>
+      </details>
+      <details><summary><svg class="ico"><use href="#i-plus"/></svg>Is it really free?</summary><div class="answer"><p>Yes. No account, no subscription, no watermark and no ads.</p></div></details>
+      <details><summary><svg class="ico"><use href="#i-plus"/></svg>Which sites does it support?</summary><div class="answer"><p>Anything <code>yt-dlp</code> supports, which is thousands of sites, including YouTube, Instagram, X, TikTok, Vimeo, Reddit and Pinterest. See the <a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md" target="_blank" rel="noopener">full list</a>.</p></div></details>
+      <details><summary><svg class="ico"><use href="#i-plus"/></svg>A site stopped working. What now?</summary><div class="answer"><p>Relaunch the app. When it manages <code>yt-dlp</code> itself, it updates it in the background, and the site usually works again.</p></div></details>
+      <details><summary><svg class="ico"><use href="#i-plus"/></svg>What do I need to run it?</summary><div class="answer"><p>macOS 14 Sonoma or later, on Apple silicon or Intel. The download is a single universal build.</p></div></details>
+      <details><summary><svg class="ico"><use href="#i-plus"/></svg>Can I download anything I like?</summary><div class="answer"><p>Please only save media you have the right to keep, and respect the terms of the sites you use and the people who made the work.</p></div></details>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container cta-inner">
+    <div class="cta-copy reveal">
+      <h2 class="display h2">Keep what<br />you find.</h2>
+      <p class="lead">Free, private and one shortcut away. Give it a link and see.</p>
+      <a class="link-cta" href="https://github.com/arnabbagxd/Downloader/releases/latest/download/DownloadIt-macos-universal.dmg">Download for macOS <svg class="ico"><use href="#i-arrow-right"/></svg></a>
+    </div>
+    <div class="cta-art" aria-hidden="true">
+      <svg viewBox="0 0 460 300" width="100%">
+        <path d="M0 300 C60 248 160 236 230 236 C300 236 400 248 460 300Z" fill="#EDE7DC"/>
+        <g transform="translate(250 168) rotate(10)"><use href="#m-photo" width="70" height="70"/></g>
+        <g transform="translate(310 150) rotate(-6)"><use href="#m-pdf" width="60" height="75"/></g>
+        <g transform="translate(70 168) rotate(-8)"><use href="#m-film" width="100" height="85"/></g>
+        <g transform="translate(160 86)"><use href="#m-file" width="110" height="138"/></g>
+        <g transform="translate(30 220)"><path d="M10 30 v-18" stroke="#44C67F" stroke-width="3" stroke-linecap="round"/><circle cx="10" cy="8" r="7" fill="#F966AC"/><circle cx="10" cy="8" r="2.5" fill="#FFCF7B"/></g>
+        <g transform="translate(400 212)"><path d="M10 34 v-22" stroke="#44C67F" stroke-width="3" stroke-linecap="round"/><circle cx="10" cy="8" r="8" fill="#FFBE4C"/><circle cx="10" cy="8" r="3" fill="#FF5310"/></g>
+        <g transform="translate(372 230)"><path d="M8 24 v-14" stroke="#44C67F" stroke-width="3" stroke-linecap="round"/><circle cx="8" cy="7" r="6" fill="#7DC4FF"/></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a class="brand" href="#top"><img src="app-icon.png" alt="" />Download It</a><p class="small muted" style="margin-top:12px;max-width:16rem">A native macOS downloader for video, images and PDFs.</p></div>
+      <div><h4>Product</h4><ul><li><a href="https://github.com/arnabbagxd/Downloader/releases/latest">Download</a></li><li><a href="https://github.com/arnabbagxd/Downloader/releases">Release notes</a></li><li><a href="https://github.com/arnabbagxd/Downloader/blob/main/docs/INSTALL.md">Install guide</a></li></ul></div>
+      <div><h4>Open source</h4><ul><li><a href="https://github.com/arnabbagxd/Downloader">Source code</a></li><li><a href="https://github.com/arnabbagxd/Downloader#build-from-source">Build from source</a></li><li><a href="https://github.com/arnabbagxd/Downloader/issues">Report an issue</a></li></ul></div>
+      <div><h4>Built on</h4><ul><li><a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a></li><li><a href="https://ffmpeg.org/">FFmpeg</a></li><li><a href="https://lucide.dev">Lucide icons</a></li><li><a href="https://simpleicons.org">Simple Icons</a></li></ul></div>
+    </div>
+    <div class="footer-base"><span>© <span id="yr">2026</span> Download It. Free and open source. Site names and logos belong to their owners.</span><a href="https://github.com/arnabbagxd/Downloader" aria-label="GitHub"><svg><use href="#b-github"/></svg></a></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  document.documentElement.classList.add('js');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (id) => document.getElementById(id);
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const use = (id, cls = 'ico', fill = '') => `<svg class="${cls}"><use href="#${id}"${fill ? ` fill="${fill}"` : ''}/></svg>`;
+  $('yr').textContent = new Date().getFullYear();
+
+  /* Real brand marks */
+  const BRAND = {
+    youtube: ['YouTube', '#FF0000'], instagram: ['Instagram', '#FF0069'], x: ['X', '#000000'], tiktok: ['TikTok', '#000000'],
+    vimeo: ['Vimeo', '#1AB7EA'], reddit: ['Reddit', '#FF4500'], pinterest: ['Pinterest', '#BD081C'], soundcloud: ['SoundCloud', '#FF5500'], twitch: ['Twitch', '#9146FF'],
+  };
+  const mark = (b, cls = '') => `<svg class="${cls}"><use href="#b-${b}" fill="${BRAND[b][1]}"/></svg>`;
+
+  /* Painted frames: small scenes standing in for real video stills */
+  const PH = {
+    studio: '<i style="inset:0;background:linear-gradient(#2a1a33,#120c18)"></i><i style="left:8%;top:-20%;width:34%;height:120%;background:linear-gradient(rgb(255 196 120 / .55),transparent 80%);transform:skewX(-12deg)"></i><i style="right:10%;top:-20%;width:30%;height:120%;background:linear-gradient(rgb(140 180 255 / .45),transparent 80%);transform:skewX(14deg)"></i><i style="left:0;right:0;bottom:0;height:24%;background:#1b1320"></i><i style="left:22%;bottom:16%;width:12%;height:40%;border-radius:40% 40% 8% 8%;background:#0b080d"></i><i style="left:46%;bottom:14%;width:14%;height:48%;border-radius:40% 40% 8% 8%;background:#0b080d"></i><i style="left:70%;bottom:16%;width:11%;height:36%;border-radius:40% 40% 8% 8%;background:#0b080d"></i><i style="left:44%;bottom:20%;width:22%;height:10%;border-radius:3px;background:#c98a3a;opacity:.8"></i>',
+    harbour: '<i style="inset:0;background:linear-gradient(#ffb36b,#ff7d6b 55%,#f06292)"></i><i style="left:58%;top:30%;width:18%;aspect-ratio:1;border-radius:50%;background:#ffe2a8"></i><i style="left:0;right:0;bottom:0;height:40%;background:linear-gradient(#3b4a8c,#1e2752)"></i><i style="left:14%;bottom:34%;width:16%;height:7%;background:#1e2752;border-radius:0 0 40% 40%"></i><i style="left:20%;bottom:41%;width:1.5%;height:18%;background:#1e2752"></i><i style="left:62%;bottom:16%;width:22%;height:3%;background:rgb(255 226 168 / .5);border-radius:2px"></i>',
+    lisbon: '<i style="inset:0;background:linear-gradient(#bfe0ff,#e9f4ff)"></i><i style="left:0;bottom:0;width:38%;height:72%;background:#f2c14e"></i><i style="left:38%;bottom:0;width:30%;height:60%;background:#f08a5d"></i><i style="left:68%;bottom:0;width:32%;height:80%;background:#7fc8a9"></i><i style="left:4%;bottom:12%;width:30%;height:50%;background:repeating-linear-gradient(90deg,transparent 0 18%,rgb(255 255 255 / .55) 18% 30%),repeating-linear-gradient(transparent 0 20%,rgb(0 0 0 / .0) 20% 34%);opacity:.9"></i><i style="left:72%;bottom:14%;width:24%;height:56%;background:repeating-linear-gradient(90deg,transparent 0 22%,rgb(255 255 255 / .5) 22% 36%)"></i><i style="left:30%;bottom:0;width:40%;height:22%;background:#f5d547;border-radius:6px 6px 0 0"></i><i style="left:34%;bottom:9%;width:32%;height:7%;background:rgb(40 60 90 / .55)"></i>',
+    ceramics: '<i style="inset:0;background:#efe6d8"></i><i style="left:8%;top:12%;width:38%;height:38%;border-radius:50%;background:#c9b49a"></i><i style="left:14%;top:18%;width:26%;height:26%;border-radius:50%;background:#e8dccb"></i><i style="left:54%;top:10%;width:36%;height:36%;border-radius:50%;background:#5c7f8f"></i><i style="left:60%;top:16%;width:24%;height:24%;border-radius:50%;background:#7fa3b1"></i><i style="left:20%;top:56%;width:30%;height:36%;border-radius:12% 12% 40% 40%;background:#b5654a"></i><i style="left:58%;top:58%;width:30%;height:32%;border-radius:50%;background:#d8c6a6"></i>',
+    walk: '<i style="inset:0;background:#1d1f24"></i><i style="left:8%;top:12%;width:84%;height:76%;border-radius:4px;background:#fff"></i><i style="left:8%;top:12%;width:20%;height:76%;background:#f1f2f4"></i><i style="left:32%;top:22%;width:40%;height:8%;border-radius:2px;background:#d6d9de"></i><i style="left:32%;top:38%;width:54%;height:34%;border-radius:3px;background:#148dff;opacity:.85"></i>',
+    reel: '<i style="inset:0;background:linear-gradient(160deg,#ffd29d,#ff8a65)"></i><i style="left:30%;top:22%;width:40%;height:56%;border-radius:45% 45% 38% 38%;background:#5b3a29"></i><i style="left:36%;top:14%;width:28%;height:28%;border-radius:50%;background:#f4c7a1"></i>',
+  };
+  const paint = (k) => `<div class="ph">${PH[k]}</div>`;
+  document.querySelectorAll('[data-thumb]').forEach(el => { el.insertAdjacentHTML('afterbegin', paint(el.dataset.thumb)); if (!el.style.position) el.style.position = 'relative'; });
+
+  /* Pie wedge path (28-unit viewBox) */
+  function piePath(p, r = 9, c = 14) {
+    p = Math.min(Math.max(p, 0), 0.9999); if (p <= 0) return '';
+    const a = -Math.PI / 2 + p * Math.PI * 2, x = c + r * Math.cos(a), y = c + r * Math.sin(a);
+    return `M${c} ${c} L${c} ${c - r} A${r} ${r} 0 ${p > .5 ? 1 : 0} 1 ${x.toFixed(2)} ${y.toFixed(2)} Z`;
+  }
+
+  /* ================= HERO SCENE ================= */
+  const scene = $('scene'), app = $('app'), field = $('field'), pie = $('pie'), piePathEl = $('pie-path');
+  const probe = $('probe'), pick = $('pick'), hist = $('history'), toast = $('toast'), hud = $('hud'), cursor = $('cursor');
+  const PLACE = 'Paste a video or image link — Instagram, X, YouTube…';
+
+  const jobs = [
+    { brand: 'youtube', url: 'youtube.com/watch?v=k3Lm9xQe2', full: 'https://www.youtube.com/watch?v=k3Lm9xQe2', title: 'Live studio session, full set', frame: 'studio',
+      q: [['2160p', '4K'], ['1440p', '2K'], ['1080p', 'HD'], ['720p', '']], pick: 2, meta: '1080p · 48 MB', dur: '42:18' },
+    { brand: 'vimeo', url: 'vimeo.com/874120553', full: 'https://vimeo.com/874120553', title: 'Product walkthrough, v2', frame: 'walk',
+      q: [['1080p', 'HD'], ['720p', ''], ['540p', ''], ['360p', '']], pick: 0, meta: '1080p · 22 MB', dur: '3:05' },
+    { brand: 'instagram', url: 'instagram.com/reel/C9xQ2hRt', full: 'https://www.instagram.com/reel/C9xQ2hRt', title: 'Sunset over the harbour', frame: 'harbour',
+      q: [['1080p', 'HD'], ['720p', ''], ['480p', ''], ['Audio', 'M4A']], pick: 0, meta: '1080p · 9 MB', dur: '0:28' },
+  ];
+  const hItems = [
+    { brand: 'pinterest', name: 'Moodboard, ceramics', meta: '24 images · ZIP', t: 'ceramics' },
+    { brand: 'x', name: 'Morning light, Lisbon', meta: 'Image · JPG', t: 'lisbon' },
+  ];
+  function hrow(it, fresh) {
+    return `<div class="hrow${fresh ? ' fresh' : ''}"><div class="thumb">${paint(it.t)}${it.dur ? `<span class="dur">${it.dur}</span>` : ''}</div><div class="hmeta"><b>${it.name}</b><small>${mark(it.brand)}${BRAND[it.brand][0]} · ${it.meta}</small></div><div class="hact"><span>${use('i-scissors')}</span><span class="${fresh ? 'ok' : ''}">${use(fresh ? 'i-check' : 'i-copy')}</span><span>${use('i-ellipsis')}</span></div></div>`;
+  }
+  function renderHist(fresh) { hist.innerHTML = hItems.slice(0, 3).map((it, i) => hrow(it, fresh && i === 0)).join(''); }
+
+  function setPage(j) {
+    $('b-fav').innerHTML = `<use href="#b-${j.brand}" fill="${BRAND[j.brand][1]}"/>`;
+    $('b-url').textContent = j.url; $('b-title').textContent = j.title; $('b-frame').innerHTML = paint(j.frame);
+  }
+  // Poster: the result of job 1 already on screen
+  setPage(jobs[0]);
+  hItems.unshift({ brand: jobs[0].brand, name: jobs[0].title, meta: jobs[0].meta, t: jobs[0].frame, dur: jobs[0].dur });
+  renderHist(true);
+  $('b-url').classList.add('sel');
+
+  function at(el, dx = .5, dy = .5) {
+    const s = scene.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return [r.left - s.left + r.width * dx - 5, r.top - s.top + r.height * dy - 3];
+  }
+  async function moveTo(el, dx, dy, ms = 700) { const [x, y] = at(el, dx, dy); cursor.style.transitionDuration = ms + 'ms'; cursor.style.transform = `translate(${x}px, ${y}px)`; await sleep(ms); }
+  async function click() { cursor.classList.add('press'); await sleep(110); cursor.classList.remove('press'); await sleep(80); }
+  async function keys(list, label, hold = 900) {
+    hud.innerHTML = list.map(k => `<kbd>${k}</kbd>`).join('') + (label ? `<span>${label}</span>` : '');
+    hud.classList.add('on'); await sleep(hold); hud.classList.remove('on'); await sleep(160);
+  }
+  function show(el) { [probe, pick].forEach(c => c.classList.toggle('off', c !== el)); hist.style.transition = 'transform 420ms var(--ease), opacity 240ms'; hist.style.transform = el ? `translateY(${el.offsetHeight + 12}px)` : ''; hist.style.opacity = el ? '.5' : ''; }
+
+  async function runJob(j) {
+    // Reset with a visible cause: Esc dismisses the panel
+    await keys(['esc'], 'Hide Download It', 700);
+    app.classList.add('off'); $('b-url').classList.remove('sel');
+    await sleep(500);
+    setPage(j);
+    await sleep(700);
+    await moveTo($('b-url'), .6, .5, 800); await click();
+    $('b-url').classList.add('sel');
+    await keys(['⌘', 'C'], 'Copy link', 700);
+    await keys(['⌘', '⇧', '6'], 'Show Download It', 800);
+    app.classList.remove('off'); field.className = 'field is-ph'; field.textContent = PLACE;
+    await sleep(420);
+    await moveTo($('capsule'), .45, .5, 650);
+    await keys(['⌘', 'V'], 'Paste', 500);
+    field.className = 'field'; field.innerHTML = j.full + '<span class="caret"></span>';
+    await sleep(400);
+    show(probe); await sleep(1200);
+    $('pick-sub').textContent = `${BRAND[j.brand][0]} · ${j.q.length} qualities available`;
+    $('qrow').innerHTML = j.q.map(([l, s]) => `<div class="qbox"><b>${l}</b><small>${s || '&nbsp;'}</small></div>`).join('');
+    show(pick); await sleep(500);
+    const box = $('qrow').children[j.pick];
+    await moveTo(box, .5, .55, 600); box.classList.add('hot'); await sleep(260);
+    box.classList.add('press'); await click(); box.classList.remove('press');
+    show(null);
+    pie.classList.add('on');
+    for (let p = 0; p <= 1; p += .04) { piePathEl.setAttribute('d', piePath(p)); await sleep(50 + Math.random() * 30); }
+    piePathEl.setAttribute('d', piePath(1)); await sleep(200);
+    pie.classList.remove('on'); field.className = 'field is-ph'; field.textContent = PLACE;
+    hItems.unshift({ brand: j.brand, name: j.title, meta: j.meta, t: j.frame, dur: j.dur }); hItems.length = Math.min(hItems.length, 4);
+    renderHist(true);
+    toast.classList.add('on');
+    await moveTo(hist.querySelector('.hrow'), .5, .8, 600);
+    await sleep(1600); toast.classList.remove('on');
+    await sleep(1600);
+    setTimeout(() => piePathEl.setAttribute('d', ''), 300);
+  }
+  async function heroLoop() {
+    cursor.style.transform = `translate(${scene.clientWidth * .78}px, ${scene.clientHeight * .82}px)`;
+    let i = 1; await sleep(1800);
+    while (true) { await runJob(jobs[i % jobs.length]); i++; }
+  }
+  const tick = () => { const d = new Date(); $('clock').textContent = d.toLocaleDateString([], { weekday: 'short' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
+  tick(); setInterval(tick, 20000);
+
+  /* ================= BENTO ================= */
+  const listData = [
+    { brand: 'youtube', name: 'Live studio session, full set', meta: '1080p · MP4', t: 'studio', dur: '42:18' },
+    { brand: 'instagram', name: 'Sunset over the harbour', meta: '1080p · MP4', t: 'harbour', dur: '0:28' },
+    { brand: 'pinterest', name: 'Moodboard, ceramics', meta: '24 images · ZIP', t: 'ceramics' },
+    { brand: 'x', name: 'Morning light, Lisbon', meta: 'Image · JPG', t: 'lisbon' },
+    { brand: 'vimeo', name: 'Product walkthrough, v2', meta: '1080p · MP4', t: 'walk', dur: '3:05' },
+    { brand: 'reddit', name: 'Kiln opening, time-lapse', meta: '720p · MP4', t: 'ceramics', dur: '1:12' },
+  ];
+  const mrow = (it) => `<div class="mrow"><div class="mrow-del">${use('i-trash-2')}</div><div class="mrow-fg"><div class="thumb">${paint(it.t)}${it.dur ? `<span class="dur">${it.dur}</span>` : ''}</div><div class="hmeta"><b>${it.name}</b><small>${mark(it.brand)}${BRAND[it.brand][0]} · ${it.meta}</small></div></div></div>`;
+  const bList = $('b-list'); let lq = [...listData];
+  const drawList = () => bList.innerHTML = lq.slice(0, 5).map(mrow).join('');
+  drawList();
+  async function listLoop() {
+    while (true) {
+      await sleep(2600);
+      const row = bList.children[2]; row.classList.add('swiped'); await sleep(1100);
+      row.classList.add('gone'); await sleep(420);
+      lq.push(lq.splice(2, 1)[0]);
+      const next = document.createElement('div'); next.innerHTML = mrow(lq[4]); const el = next.firstChild;
+      el.style.opacity = '0'; bList.appendChild(el); row.remove();
+      requestAnimationFrame(() => { el.style.opacity = ''; });
+    }
+  }
+  async function keysLoop() {
+    const ks = [$('k1'), $('k2'), $('k3')], cap = $('k-cap');
+    while (true) {
+      for (const k of ks) { k.classList.add('down'); await sleep(160); }
+      cap.textContent = 'Download It is in front'; await sleep(1000);
+      ks.forEach(k => k.classList.remove('down')); await sleep(1800);
+      cap.textContent = 'Works from any app'; await sleep(800);
+    }
+  }
+  $('b-pie').setAttribute('d', piePath(.66, 10));
+  async function pieLoop() {
+    const path = $('b-pie'), lbl = $('b-pie-label');
+    while (true) {
+      await sleep(1600);
+      for (let p = .66; p <= 1; p += .012 + Math.random() * .014) { path.setAttribute('d', piePath(p, 10)); lbl.textContent = `${(p * 48).toFixed(1)} of 48.0 MB`; await sleep(70); }
+      path.setAttribute('d', piePath(1, 10)); lbl.textContent = 'Done · copied to clipboard'; await sleep(2200);
+      path.setAttribute('d', ''); lbl.textContent = 'Next download'; await sleep(700);
+      for (let p = 0; p <= .66; p += .012 + Math.random() * .014) { path.setAttribute('d', piePath(p, 10)); lbl.textContent = `${(p * 48).toFixed(1)} of 48.0 MB`; await sleep(70); }
+    }
+  }
+  async function remuxLoop() {
+    const r1 = $('r1'), r2 = $('r2'), r1t = $('r1t'), r2t = $('r2t');
+    while (true) {
+      await sleep(2400);
+      r1.style.width = r2.style.width = '0%'; r1t.textContent = '0.0s'; r2t.textContent = '0s'; await sleep(500);
+      const start = performance.now();
+      await new Promise(res => { const step = (now) => { const s = (now - start) / 1000; const p1 = Math.min(s / 1.4, 1), p2 = Math.min(s / 5.5, 1) * .42;
+        r1.style.width = p1 * 100 + '%'; r1t.textContent = (p1 * 3.2).toFixed(1) + 's'; r2.style.width = p2 * 100 + '%'; r2t.textContent = Math.round(p2 / .42 * 96) + 's';
+        s < 5.5 ? requestAnimationFrame(step) : res(); }; requestAnimationFrame(step); });
+      r2t.textContent = '~4 min';
+    }
+  }
+  $('film').innerHTML = ['studio','studio','harbour','harbour','lisbon','lisbon','ceramics','walk'].map(k => `<i>${paint(k)}</i>`).join('') + '<span class="trim-sel" id="t-sel" style="left:12%;right:30%"></span>';
+  async function trimLoop() {
+    const sel = $('t-sel'), tin = $('t-in'), tout = $('t-out');
+    const st = [[12, 30, '0:04', '0:21'], [34, 14, '0:11', '0:26'], [6, 52, '0:02', '0:14']]; let i = 1;
+    while (true) { await sleep(2400); const [l, r, a, b] = st[i++ % st.length]; sel.style.left = l + '%'; sel.style.right = r + '%'; tin.textContent = a; tout.textContent = b; }
+  }
+
+  /* ================= FEATURES ================= */
+  const sites = [['youtube','youtube.com/watch?v=k3Lm9xQe2'],['instagram','instagram.com/reel/C9xQ2hRt'],['x','x.com/lisbonlight/status/1849…'],['tiktok','tiktok.com/@studio/video/7341…'],['vimeo','vimeo.com/874120553'],['reddit','reddit.com/r/videos/comments/1g8…'],['pinterest','pinterest.com/studio/ceramics'],['soundcloud','soundcloud.com/studio/full-set'],['twitch','twitch.tv/videos/2013447…']];
+  $('logos').innerHTML = sites.map(([b]) => `<span class="logo">${mark(b)}${BRAND[b][0]}</span>`).join('');
+  $('logos').children[0].classList.add('lit');
+  async function sitesLoop() {
+    const chips = $('logos').children; let i = 1;
+    while (true) {
+      await sleep(1600);
+      const k = i++ % sites.length, b = sites[k][0];
+      [...chips].forEach((c, j) => c.classList.toggle('lit', j === k));
+      $('f-url').textContent = sites[k][1]; $('f-fav').innerHTML = `<use href="#b-${b}" fill="${BRAND[b][1]}"/>`;
+    }
+  }
+  const gq = [['4320p','8K'],['2160p','4K'],['1440p','2K'],['1080p','HD'],['720p',''],['Audio','M4A']];
+  $('g-qrow').innerHTML = gq.map(([l, s]) => `<div class="qbox" style="background:var(--surface-card);box-shadow:inset 0 0 0 1px var(--line)"><b>${l}</b><small>${s || '&nbsp;'}</small></div>`).join('');
+  const gHot = (k) => [...$('g-qrow').children].forEach((b, j) => { const on = j === k; b.classList.toggle('hot', on); b.style.background = on ? '' : 'var(--surface-card)'; b.style.boxShadow = on ? '' : 'inset 0 0 0 1px var(--line)'; });
+  gHot(1);
+  async function qualLoop() { const order = [3, 0, 4, 1]; let i = 0; while (true) { await sleep(1600); gHot(order[i++ % order.length]); } }
+
+  const pl = [['Opening, warm-up', 'studio', '6:12'], ['Second track, live take', 'harbour', '4:48'], ['Interlude, acoustic', 'lisbon', '3:20'], ['Questions from the room', 'walk', '11:02'], ['Closing set', 'ceramics', '9:47']];
+  const pList = $('p-list');
+  pList.innerHTML = pl.map(([n, t, d]) => `<div class="pl-item"><div class="thumb">${paint(t)}</div><div style="min-width:0"><b>${n}</b><div class="track"><i style="width:100%"></i></div></div><span class="pl-state done">${use('i-check')}</span></div>`).join('');
+  async function plLoop() {
+    const items = [...pList.children], count = $('p-count');
+    while (true) {
+      await sleep(2600);
+      items.forEach(it => { it.querySelector('.track i').style.width = '0%'; const s = it.querySelector('.pl-state'); s.className = 'pl-state wait'; s.innerHTML = ''; });
+      count.textContent = `0 / ${items.length}`; await sleep(700);
+      for (let i = 0; i < items.length; i++) {
+        const bar = items[i].querySelector('.track i');
+        for (let p = 0; p <= 100; p += 10 + Math.random() * 14) { bar.style.width = p + '%'; await sleep(110); }
+        bar.style.width = '100%'; const s = items[i].querySelector('.pl-state'); s.className = 'pl-state done'; s.innerHTML = use('i-check');
+        count.textContent = `${i + 1} / ${items.length}`; await sleep(140);
+      }
+    }
+  }
+
+  async function convLoop() {
+    const spans = [...$('c-seg').querySelectorAll('span:not(.seg-pill)')], pill = $('c-pill');
+    const st = [
+      { f: 0, q: 82, from: '4.8 MB', size: '612 KB', tag: 'lisbon-morning.heic', pdf: false },
+      { f: 1, q: 100, from: '4.8 MB', size: '3.1 MB', tag: 'lisbon-morning.heic', pdf: false },
+      { f: 2, q: 75, from: 'Page 3 of 12', size: '388 KB', tag: 'field-notes.pdf', pdf: true },
+      { f: 3, q: 60, from: 'Page 3 of 12', size: '204 KB', tag: 'field-notes.pdf', pdf: true },
+    ];
+    let i = 1;
+    while (true) {
+      await sleep(2000);
+      const s = st[i++ % st.length];
+      pill.style.transform = `translateX(${s.f * 100}%)`; spans.forEach((sp, j) => sp.classList.toggle('on', j === s.f));
+      $('c-q').textContent = s.f === 1 ? 'Lossless' : s.q + '%'; $('c-fill').style.width = s.q + '%'; $('c-knob').style.left = s.q + '%';
+      $('c-size').textContent = s.size; $('c-from').textContent = s.from; $('c-tag').textContent = s.tag;
+      $('c-tag-ico').innerHTML = `<use href="#i-${s.pdf ? 'file-text' : 'image'}"/>`;
+      $('c-photo').style.opacity = s.pdf ? 0 : 1; $('c-pdf').style.opacity = s.pdf ? 1 : 0;
+    }
+  }
+
+  /* Start each loop once it is on screen; every element already shows its resting frame */
+  if (!reduce) {
+    const loops = new Map([[scene, heroLoop], [bList, listLoop], [$('k1'), keysLoop], [$('b-pie'), pieLoop], [$('r1'), remuxLoop], [$('film'), trimLoop], [$('logos'), sitesLoop], [$('g-qrow'), qualLoop], [pList, plLoop], [$('c-seg'), convLoop]]);
+    const io = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting && loops.has(e.target)) { loops.get(e.target)(); loops.delete(e.target); io.unobserve(e.target); } }), { threshold: .25 });
+    loops.forEach((_, el) => io.observe(el));
+
+    // Blocks below the fold fade and rise once as they arrive; siblings stagger a little
+    const vh = innerHeight;
+    document.querySelectorAll('.reveal').forEach(el => {
+      if (el.getBoundingClientRect().top > vh * .92) el.classList.add('pending');
+      const sibs = [...el.parentElement.children].filter(c => c.classList.contains('reveal'));
+      el.style.setProperty('--d', Math.min(sibs.indexOf(el), 4) * 80 + 'ms');
+      el.querySelectorAll('.check li').forEach((li, k) => li.style.setProperty('--i', k));
+    });
+    const rio = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove('pending'); rio.unobserve(e.target); } }), { threshold: .15, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal.pending').forEach(el => rio.observe(el));
+
+    // Smooth scroll (Lenis), with anchor links landing below the sticky nav
+    if (window.Lenis) {
+      const lenis = new Lenis({ duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 4), smoothWheel: true });
+      const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+      document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', (ev) => {
+        const id = a.getAttribute('href'); const target = id === '#top' ? 0 : document.querySelector(id);
+        if (target === null) return;
+        ev.preventDefault(); lenis.scrollTo(target, { offset: id === '#top' ? 0 : -60 });
+        history.replaceState(null, '', id);
+      }));
+    }
+  }
+
+  const nav = document.querySelector('.nav');
+  const navState = () => nav.classList.toggle('scrolled', scrollY > 8);
+  navState(); addEventListener('scroll', navState, { passive: true });
+
+  /* Live release and stars from GitHub; quiet fallbacks if blocked */
+  fetch('https://api.github.com/repos/arnabbagxd/Downloader').then(r => r.ok ? r.json() : null).then(d => { if (d && typeof d.stargazers_count === 'number') { const s = $('star-count'); s.textContent = d.stargazers_count.toLocaleString(); s.hidden = false; } }).catch(() => {});
+  fetch('https://api.github.com/repos/arnabbagxd/Downloader/releases/latest').then(r => r.ok ? r.json() : null).then(d => { if (d && d.tag_name) $('ver').textContent = d.tag_name; }).catch(() => {});
+})();
+</script>
+</body>
+</html>
